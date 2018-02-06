@@ -30,6 +30,12 @@ object PermissionUtil {
         return true
     }
 
+    fun getDeniedPermissions(permissions: Array<String>, grantResults: IntArray): Array<String> =
+            permissions.filterIndexed { index, s ->
+                grantResults[index] == PackageManager.PERMISSION_DENIED
+            }.toTypedArray()
+
+
     /**
      * Returns true if the Activity has access to all given permissions.
      * Always returns true on platforms below M.
