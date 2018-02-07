@@ -9,28 +9,42 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.util.Log
 import org.jetbrains.anko.alert
+import java.lang.reflect.Method
 
 
-data class PermissionsRequestHolder(
-        var permissions: Array<String>,
-        var shouldShowRationale: Boolean = false,
+data class QuickPermissionsRequest(
+        var target: PermissionCheckerFragment,
+        var permissions: Array<String> = arrayOf(),
+        var handleRationale: Boolean = true,
         var rationaleMessage: String = "",
-        var shouldShowPermenentlyDeniedDialog: Boolean = false,
-        var permenetlyDeniedMessage: String = ""
-)
+        var handlePermanentlyDenied: Boolean = true,
+        var permanentlyDeniedMessage: String = "",
+        var rationaleMethod: Method? = null,
+        var permanentDeniedMethod: Method? = null
+) {
+    fun proceed() {
+        target.requestPermissionsFromUser(this)
+    }
+
+    fun cancel() {
+    }
+}
 
 /**
  * A simple [Fragment] subclass.
  */
 class PermissionCheckerFragment : Fragment() {
 
-    var permissions: Array<String> = arrayOf()
+    var quickPermissionsRequest: QuickPermissionsRequest? = null
+//    private var permissions: Array<String> = arrayOf()
 
-    interface PermissionCallback {
-        fun onPermissionResult()
+    interface QuickPermissionsCallback {
+        fun shouldShowRequestPermissionsRationale(quickPermissionsRequest: QuickPermissionsRequest?)
+        fun onPermissionsGranted(quickPermissionsRequest: QuickPermissionsRequest?)
+        fun onPermissionsPermanentlyDenied(quickPermissionsRequest: QuickPermissionsRequest?)
     }
 
-    var mListener: PermissionCallback? = null
+    var mListener: QuickPermissionsCallback? = null
 
     companion object {
         private val TAG = Companion::class.java.simpleName
@@ -43,15 +57,15 @@ class PermissionCheckerFragment : Fragment() {
         Log.d(TAG, "onCreate: permission fragment created")
     }
 
-    fun setListener(listener: PermissionCallback) {
+    fun setListener(listener: QuickPermissionsCallback) {
         mListener = listener
         Log.d(TAG, "onCreate: listeners set")
     }
 
-    fun requestPermissions(permissions: Array<String>) {
-        this.permissions = permissions
-        Log.d(TAG, "requestPermissions: requesting permissions")
-        requestPermissions(permissions, 101)
+    fun requestPermissionsFromUser(quickPermissionsRequest: QuickPermissionsRequest?) {
+        this.quickPermissionsRequest = quickPermissionsRequest
+        Log.d(TAG, "requestPermissionsFromUser: requesting permissions")
+        requestPermissions(quickPermissionsRequest?.permissions.orEmpty(), 101)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -73,7 +87,7 @@ class PermissionCheckerFragment : Fragment() {
     private fun handlePermissionResult(permissions: Array<String>, grantResults: IntArray) {
         if (PermissionUtil.hasSelfPermission(context, permissions)) {
             // we are good to go!
-            mListener?.onPermissionResult()
+            mListener?.onPermissionsGranted(quickPermissionsRequest)
         } else {
             // we are still missing permissions
             val deniedPermissions = PermissionUtil.getDeniedPermissions(permissions, grantResults)
@@ -91,9 +105,15 @@ class PermissionCheckerFragment : Fragment() {
                 }
             }
 
-            if (isPermenentlyDenied) {
+            if (quickPermissionsRequest?.handlePermanentlyDenied == true && isPermenentlyDenied) {
+
+                quickPermissionsRequest?.permanentDeniedMethod?.let {
+                    mListener?.onPermissionsPermanentlyDenied(quickPermissionsRequest)
+                    return
+                }
+
                 activity.alert {
-                    message = "We found you have permenently denied some permissions. To continue using our app, please allow it from settings."
+                    message = quickPermissionsRequest?.permanentlyDeniedMessage.orEmpty()
                     positiveButton("SETTINGS") {
                         val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS,
                                 fromParts("package", activity.packageName, null))
@@ -106,11 +126,17 @@ class PermissionCheckerFragment : Fragment() {
             }
 
             // if should show rationale dialog
-            if (shouldShowRationale) {
+            if (quickPermissionsRequest?.handleRationale == true && shouldShowRationale) {
+
+                quickPermissionsRequest?.rationaleMethod?.let {
+                    mListener?.shouldShowRequestPermissionsRationale(quickPermissionsRequest)
+                    return
+                }
+
                 activity.alert {
-                    message = "Permissions are required to run this function. Please allow us to move ahead."
+                    message = quickPermissionsRequest?.rationaleMessage.orEmpty()
                     positiveButton("TRY AGAIN") {
-                        requestPermissions(permissions)
+                        requestPermissionsFromUser(quickPermissionsRequest)
                     }
                     negativeButton("CANCEL") { }
                 }.apply { isCancelable = false }.show()
@@ -121,6 +147,7 @@ class PermissionCheckerFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 101) {
+            val permissions = quickPermissionsRequest?.permissions ?: emptyArray()
             val grantResults = IntArray(permissions.size)
             permissions.forEachIndexed { index, s ->
                 grantResults[index] = ActivityCompat.checkSelfPermission(context, s)

@@ -4,14 +4,18 @@ import android.app.Activity
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.livinglifetechway.quickpermissions.annotations.OnPermissionPermanentlyDenied
+import com.livinglifetechway.quickpermissions.annotations.OnShowRationalePermissionDialog
 import com.livinglifetechway.quickpermissions.annotations.RequiresPermissions
 import com.livinglifetechway.quickpermissions.util.PermissionCheckerFragment
 import com.livinglifetechway.quickpermissions.util.PermissionUtil
+import com.livinglifetechway.quickpermissions.util.QuickPermissionsRequest
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.aspectj.lang.reflect.MethodSignature
+import java.lang.reflect.Method
 
 /**
  * Injects code to ask for permissions before executing any code that requires permissions
@@ -84,20 +88,35 @@ class PermissionsManager {
 
                 }
 
-                permissionCheckerFragment.setListener(object : PermissionCheckerFragment.PermissionCallback {
-                    override fun onPermissionResult() {
+                permissionCheckerFragment.setListener(object : PermissionCheckerFragment.QuickPermissionsCallback {
+                    override fun shouldShowRequestPermissionsRationale(quickPermissionsRequest: QuickPermissionsRequest?) {
+                        quickPermissionsRequest?.rationaleMethod?.invoke(joinPoint.target, quickPermissionsRequest)
+                    }
+
+                    override fun onPermissionsGranted(quickPermissionsRequest: QuickPermissionsRequest?) {
                         Log.d(TAG, "weaveJoinPoint: got permissions")
                         try {
                             joinPoint.proceed()
                         } catch (throwable: Throwable) {
                             throwable.printStackTrace()
                         }
+                    }
 
+                    override fun onPermissionsPermanentlyDenied(quickPermissionsRequest: QuickPermissionsRequest?) {
+                        quickPermissionsRequest?.permanentDeniedMethod?.invoke(joinPoint.target, quickPermissionsRequest)
                     }
                 })
 
                 // now actually request permissions
-                permissionCheckerFragment.requestPermissions(permissions)
+                var permissionRequest = QuickPermissionsRequest(permissionCheckerFragment, permissions)
+                permissionRequest.handleRationale = annotation.handleRationale
+                permissionRequest.handlePermanentlyDenied = annotation.handlePermanentlyDenied
+                permissionRequest.rationaleMessage = if (annotation.rationaleMessage.isBlank()) "default rationale" else annotation.rationaleMessage
+                permissionRequest.permanentlyDeniedMessage = if (annotation.permanentlyDeniedMessage.isBlank()) "default perm denied" else annotation.permanentlyDeniedMessage
+                permissionRequest.rationaleMethod = getMethodWithAnnotation<OnShowRationalePermissionDialog>(joinPoint.target)
+                permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
+
+                permissionCheckerFragment.requestPermissionsFromUser(permissionRequest)
             }
         } else {
             // context is null
@@ -105,6 +124,13 @@ class PermissionsManager {
             // crash the app RIGHT NOW!
         }
         return null
+    }
+
+    inline fun <reified T : Annotation> getMethodWithAnnotation(instance: Any): Method? {
+        // returns first matched  method or null
+        return instance::class.java.declaredMethods.firstOrNull {
+            it.isAnnotationPresent(T::class.java) && it.parameterTypes.size == 1 && it.parameterTypes[0] == QuickPermissionsRequest::class.java
+        }
     }
 
     companion object {
