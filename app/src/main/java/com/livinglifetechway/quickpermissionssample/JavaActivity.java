@@ -17,7 +17,7 @@ public class JavaActivity extends AppCompatActivity {
         testMethod();
     }
 
-    @RequiresPermissions(permissions = {Manifest.permission.CAMERA})
+    @RequiresPermissions(permissions = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION})
     public void testMethod() {
         Toast.makeText(this, "I do have the camera permission", Toast.LENGTH_SHORT).show();
     }
