@@ -59,11 +59,18 @@ class PermissionCheckerFragment : Fragment() {
         Log.d(TAG, "passing callback")
 
         // check if permissions granted
-        handlePermissionResult(grantResults, permissions)
+        handlePermissionResult(permissions, grantResults)
 
     }
 
-    private fun handlePermissionResult(grantResults: IntArray, permissions: Array<String>) {
+    /**
+     * Checks and takes the action based on permission results retrieved from onRequestPermissionsResult
+     * and from the settings activity
+     *
+     * @param permissions List of Permissions
+     * @param grantResults A list of permission result <b>Granted</b> or <b>Denied</b>
+     */
+    private fun handlePermissionResult(permissions: Array<String>, grantResults: IntArray) {
         if (PermissionUtil.hasSelfPermission(context, permissions)) {
             // we are good to go!
             mListener?.onPermissionResult()
@@ -74,7 +81,7 @@ class PermissionCheckerFragment : Fragment() {
             // check if rationale dialog should be shown or not
             var shouldShowRationale = true
             var isPermenentlyDenied = false
-            for (i in 0 until permissions.size) {
+            for (i in 0 until deniedPermissions.size) {
                 val deniedPermission = deniedPermissions[i]
                 val rationale = shouldShowRequestPermissionRationale(deniedPermission)
                 if (!rationale) {
@@ -119,7 +126,7 @@ class PermissionCheckerFragment : Fragment() {
                 grantResults[index] = ActivityCompat.checkSelfPermission(context, s)
             }
 
-            handlePermissionResult(grantResults, permissions)
+            handlePermissionResult(permissions, grantResults)
         }
     }
 }
