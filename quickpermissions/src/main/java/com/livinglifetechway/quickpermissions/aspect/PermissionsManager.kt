@@ -25,6 +25,11 @@ import java.lang.reflect.Method
 @Aspect
 class PermissionsManager {
 
+    companion object {
+        private val TAG = PermissionsManager::class.java.simpleName
+        private const val POINTCUT_METHOD = "execution(@com.livinglifetechway.quickpermissions.annotations.RequiresPermissions * *(..))"
+    }
+
     @Pointcut(POINTCUT_METHOD)
     fun methodAnnotatedRequiresPermissions() {
     }
@@ -42,6 +47,7 @@ class PermissionsManager {
 
         Log.d(TAG, "permissions to check: " + permissions)
 
+        // cast target to context
         val target = joinPoint.target
         var context: Context? = null
         if (target is Context) {
@@ -118,7 +124,7 @@ class PermissionsManager {
                 })
 
                 // create permission request instance
-                var permissionRequest = QuickPermissionsRequest(permissionCheckerFragment, permissions)
+                val permissionRequest = QuickPermissionsRequest(permissionCheckerFragment, permissions)
                 permissionRequest.handleRationale = annotation.handleRationale
                 permissionRequest.handlePermanentlyDenied = annotation.handlePermanentlyDenied
                 permissionRequest.rationaleMessage = if (annotation.rationaleMessage.isBlank()) "default rationale" else annotation.rationaleMessage
@@ -138,18 +144,11 @@ class PermissionsManager {
         return null
     }
 
-    inline fun <reified T : Annotation> getMethodWithAnnotation(instance: Any): Method? {
+    private inline fun <reified T : Annotation> getMethodWithAnnotation(instance: Any): Method? {
         // returns first matched  method or null
         return instance::class.java.declaredMethods.firstOrNull {
             it.isAnnotationPresent(T::class.java) && it.parameterTypes.size == 1 && it.parameterTypes[0] == QuickPermissionsRequest::class.java
         }
-    }
-
-    companion object {
-
-        private val TAG = PermissionsManager::class.java.simpleName
-
-        private const val POINTCUT_METHOD = "execution(@com.livinglifetechway.quickpermissions.annotations.RequiresPermissions * *(..))"
     }
 
 }
