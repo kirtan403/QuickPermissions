@@ -1,9 +1,10 @@
 package com.livinglifetechway.quickpermissions.aspect
 
-import android.app.Activity
 import android.content.Context
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.livinglifetechway.k4kotlin.transact
 import com.livinglifetechway.quickpermissions.annotations.OnPermissionPermanentlyDenied
 import com.livinglifetechway.quickpermissions.annotations.OnShowRationalePermissionDialog
 import com.livinglifetechway.quickpermissions.annotations.RequiresPermissions
@@ -47,47 +48,56 @@ class PermissionsManager {
             context = target
         }
 
-        if (context != null) {
+        if (context != null && (context is AppCompatActivity || context is Fragment)) {
             Log.d(TAG, "weaveJoinPoint: context found")
+
+            // check if we have the permissions
             if (PermissionUtil.hasSelfPermission(context, permissions)) {
                 Log.d(TAG, "weaveJoinPoint: already has required permissions. Proceed with the execution.")
                 joinPoint.proceed()
             } else {
+                // we don't have required permissions
+                // begin the permission request flow
+
                 Log.d(TAG, "weaveJoinPoint: doesn't have required permissions")
+
+                // check if we have permission checker fragment already attached
 
                 // support for AppCompatActivity and Activity
                 var permissionCheckerFragment = when (context) {
+                // for app compat activity
                     is AppCompatActivity -> context.supportFragmentManager.findFragmentByTag(PermissionCheckerFragment::class.java.canonicalName) as PermissionCheckerFragment?
-                    is Activity -> context.fragmentManager.findFragmentByTag(PermissionCheckerFragment::class.java.canonicalName) as PermissionCheckerFragment?
+                // for support fragment
+                    is Fragment -> context.childFragmentManager.findFragmentByTag(PermissionCheckerFragment::class.java.canonicalName) as PermissionCheckerFragment?
+                // else return null
                     else -> null
                 }
 
                 // check if permission check fragment is added or not
+                // if not, add that fragment
                 if (permissionCheckerFragment == null) {
                     Log.d(TAG, "weaveJoinPoint: adding headless fragment for asking permissions")
                     permissionCheckerFragment = PermissionCheckerFragment.newInstance()
                     when (context) {
                         is AppCompatActivity -> {
-                            context.supportFragmentManager
-                                    ?.beginTransaction()
-                                    ?.add(permissionCheckerFragment, PermissionCheckerFragment::class.java.canonicalName)
-                                    ?.commit()
-
+                            context.supportFragmentManager.transact {
+                                add(permissionCheckerFragment, PermissionCheckerFragment::class.java.canonicalName)
+                            }
                             // make sure fragment is added before we do any context based operations
                             context.supportFragmentManager.executePendingTransactions()
                         }
-                        is Activity -> {
+                        is Fragment -> {
                             // this does not work at the moment
-//                            context.fragmentManager
-//                                    ?.beginTransaction()
-//                                    ?.add(permissionCheckerFragment, PermissionCheckerFragment::class.java.canonicalName)
-//                                    ?.commit()
-
+                            context.childFragmentManager.transact {
+                                add(permissionCheckerFragment, PermissionCheckerFragment::class.java.canonicalName)
+                            }
+                            // make sure fragment is added before we do any context based operations
+                            context.childFragmentManager.executePendingTransactions()
                         }
                     }
-
                 }
 
+                // set callback to permission checker fragment
                 permissionCheckerFragment.setListener(object : PermissionCheckerFragment.QuickPermissionsCallback {
                     override fun shouldShowRequestPermissionsRationale(quickPermissionsRequest: QuickPermissionsRequest?) {
                         quickPermissionsRequest?.rationaleMethod?.invoke(joinPoint.target, quickPermissionsRequest)
@@ -107,7 +117,7 @@ class PermissionsManager {
                     }
                 })
 
-                // now actually request permissions
+                // create permission request instance
                 var permissionRequest = QuickPermissionsRequest(permissionCheckerFragment, permissions)
                 permissionRequest.handleRationale = annotation.handleRationale
                 permissionRequest.handlePermanentlyDenied = annotation.handlePermanentlyDenied
@@ -116,6 +126,7 @@ class PermissionsManager {
                 permissionRequest.rationaleMethod = getMethodWithAnnotation<OnShowRationalePermissionDialog>(joinPoint.target)
                 permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
 
+                // begin the flow by requesting permissions
                 permissionCheckerFragment.requestPermissionsFromUser(permissionRequest)
             }
         } else {
