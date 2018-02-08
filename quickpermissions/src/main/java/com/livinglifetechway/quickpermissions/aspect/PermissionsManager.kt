@@ -7,7 +7,7 @@ import android.util.Log
 import com.livinglifetechway.k4kotlin.transact
 import com.livinglifetechway.quickpermissions.annotations.OnPermissionPermanentlyDenied
 import com.livinglifetechway.quickpermissions.annotations.OnPermissionsDenied
-import com.livinglifetechway.quickpermissions.annotations.OnShowRationalePermissionDialog
+import com.livinglifetechway.quickpermissions.annotations.OnShowRationale
 import com.livinglifetechway.quickpermissions.annotations.RequiresPermissions
 import com.livinglifetechway.quickpermissions.util.PermissionCheckerFragment
 import com.livinglifetechway.quickpermissions.util.PermissionUtil
@@ -134,7 +134,7 @@ class PermissionsManager {
                 permissionRequest.handlePermanentlyDenied = annotation.handlePermanentlyDenied
                 permissionRequest.rationaleMessage = if (annotation.rationaleMessage.isBlank()) "default rationale" else annotation.rationaleMessage
                 permissionRequest.permanentlyDeniedMessage = if (annotation.permanentlyDeniedMessage.isBlank()) "default perm denied" else annotation.permanentlyDeniedMessage
-                permissionRequest.rationaleMethod = getMethodWithAnnotation<OnShowRationalePermissionDialog>(joinPoint.target)
+                permissionRequest.rationaleMethod = getMethodWithAnnotation<OnShowRationale>(joinPoint.target)
                 permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
                 permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
                 permissionRequest.permissionsDeniedMethod = getMethodWithAnnotation<OnPermissionsDenied>(joinPoint.target)

@@ -31,7 +31,7 @@ public class JavaActivity extends AppCompatActivity {
     }
 
     //
-    //    @OnShowRationalePermissionDialog
+    //    @OnShowRationale
     //    public void onShowRational(final QuickPermissionsRequest arg) {
     //        new AlertDialog.Builder(this)
     //                .setTitle("Rationale!!")

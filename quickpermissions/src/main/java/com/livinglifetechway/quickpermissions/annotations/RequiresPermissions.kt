@@ -18,7 +18,7 @@ annotation class RequiresPermissions(
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
-annotation class OnShowRationalePermissionDialog
+annotation class OnShowRationale
 
 /**
  * Permission Required annotation to safely execute code block requiring defined permissions
