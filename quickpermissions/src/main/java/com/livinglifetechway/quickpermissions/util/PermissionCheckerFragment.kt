@@ -23,6 +23,7 @@ class PermissionCheckerFragment : Fragment() {
         fun shouldShowRequestPermissionsRationale(quickPermissionsRequest: QuickPermissionsRequest?)
         fun onPermissionsGranted(quickPermissionsRequest: QuickPermissionsRequest?)
         fun onPermissionsPermanentlyDenied(quickPermissionsRequest: QuickPermissionsRequest?)
+        fun onPermissionsDenied(quickPermissionsRequest: QuickPermissionsRequest?)
     }
 
     companion object {
@@ -57,6 +58,11 @@ class PermissionCheckerFragment : Fragment() {
     }
 
     fun clean() {
+        // permission request flow is finishing
+        // let the caller receive callback about it
+        mListener?.onPermissionsDenied(quickPermissionsRequest)
+
+
         removeRequestPermissionsRequest()
         removeListener()
     }
@@ -88,6 +94,7 @@ class PermissionCheckerFragment : Fragment() {
         } else {
             // we are still missing permissions
             val deniedPermissions = PermissionUtil.getDeniedPermissions(permissions, grantResults)
+            quickPermissionsRequest?.deniedPermissions = deniedPermissions
 
             // check if rationale dialog should be shown or not
             var shouldShowRationale = true
@@ -117,7 +124,9 @@ class PermissionCheckerFragment : Fragment() {
                     positiveButton("SETTINGS") {
                         openAppSettings()
                     }
-                    negativeButton("CANCEL") { }
+                    negativeButton("CANCEL") {
+                        clean()
+                    }
                 }?.apply { isCancelable = false }?.show()
                 return
             }
@@ -135,7 +144,9 @@ class PermissionCheckerFragment : Fragment() {
                     positiveButton("TRY AGAIN") {
                         requestPermissionsFromUser()
                     }
-                    negativeButton("CANCEL") { }
+                    negativeButton("CANCEL") {
+                        clean()
+                    }
                 }?.apply { isCancelable = false }?.show()
             }
         }

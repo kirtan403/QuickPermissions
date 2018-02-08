@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.livinglifetechway.quickpermissions.annotations.OnPermissionPermanentlyDenied;
+import com.livinglifetechway.quickpermissions.annotations.OnPermissionsDenied;
 import com.livinglifetechway.quickpermissions.annotations.RequiresPermissions;
 import com.livinglifetechway.quickpermissions.util.QuickPermissionsRequest;
 
@@ -28,28 +29,29 @@ public class JavaActivity extends AppCompatActivity {
     public void testMethod() {
         Toast.makeText(this, "I do have the camera permission", Toast.LENGTH_SHORT).show();
     }
-//
-//    @OnShowRationalePermissionDialog
-//    public void onShowRational(final QuickPermissionsRequest arg) {
-//        new AlertDialog.Builder(this)
-//                .setTitle("Rationale!!")
-//                .setMessage("rational dialog shown")
-//                .setPositiveButton("TRY NOW", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        arg.proceed();
-//                    }
-//                })
-//                .setNegativeButton("close", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        arg.cancel();
-//                    }
-//                })
-//                .setNeutralButton(arg.getRationaleMessage(), null)
-//                .show();
-//
-//    }
+
+    //
+    //    @OnShowRationalePermissionDialog
+    //    public void onShowRational(final QuickPermissionsRequest arg) {
+    //        new AlertDialog.Builder(this)
+    //                .setTitle("Rationale!!")
+    //                .setMessage("rational dialog shown")
+    //                .setPositiveButton("TRY NOW", new DialogInterface.OnClickListener() {
+    //                    @Override
+    //                    public void onClick(DialogInterface dialogInterface, int i) {
+    //                        arg.proceed();
+    //                    }
+    //                })
+    //                .setNegativeButton("close", new DialogInterface.OnClickListener() {
+    //                    @Override
+    //                    public void onClick(DialogInterface dialogInterface, int i) {
+    //                        arg.cancel();
+    //                    }
+    //                })
+    //                .setNeutralButton(arg.getRationaleMessage(), null)
+    //                .show();
+    //
+    //    }
     @OnPermissionPermanentlyDenied
     public void onPerDenied(final QuickPermissionsRequest arg) {
         new AlertDialog.Builder(this)
@@ -58,7 +60,7 @@ public class JavaActivity extends AppCompatActivity {
                 .setPositiveButton("SET", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        arg.proceed();
+                        arg.openAppSettings();
                     }
                 })
                 .setNegativeButton("close", new DialogInterface.OnClickListener() {
@@ -70,5 +72,10 @@ public class JavaActivity extends AppCompatActivity {
                 .setNeutralButton(arg.getRationaleMessage(), null)
                 .show();
 
+    }
+
+    @OnPermissionsDenied
+    public void onDenied(QuickPermissionsRequest arg) {
+        Toast.makeText(this, "permissions denied!! " + arg.getDeniedPermissions().length, Toast.LENGTH_SHORT).show();
     }
 }

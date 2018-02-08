@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.livinglifetechway.k4kotlin.transact
 import com.livinglifetechway.quickpermissions.annotations.OnPermissionPermanentlyDenied
+import com.livinglifetechway.quickpermissions.annotations.OnPermissionsDenied
 import com.livinglifetechway.quickpermissions.annotations.OnShowRationalePermissionDialog
 import com.livinglifetechway.quickpermissions.annotations.RequiresPermissions
 import com.livinglifetechway.quickpermissions.util.PermissionCheckerFragment
@@ -105,6 +106,10 @@ class PermissionsManager {
 
                 // set callback to permission checker fragment
                 permissionCheckerFragment.setListener(object : PermissionCheckerFragment.QuickPermissionsCallback {
+                    override fun onPermissionsDenied(quickPermissionsRequest: QuickPermissionsRequest?) {
+                        quickPermissionsRequest?.permissionsDeniedMethod?.invoke(joinPoint.target, quickPermissionsRequest)
+                    }
+
                     override fun shouldShowRequestPermissionsRationale(quickPermissionsRequest: QuickPermissionsRequest?) {
                         quickPermissionsRequest?.rationaleMethod?.invoke(joinPoint.target, quickPermissionsRequest)
                     }
@@ -131,6 +136,8 @@ class PermissionsManager {
                 permissionRequest.permanentlyDeniedMessage = if (annotation.permanentlyDeniedMessage.isBlank()) "default perm denied" else annotation.permanentlyDeniedMessage
                 permissionRequest.rationaleMethod = getMethodWithAnnotation<OnShowRationalePermissionDialog>(joinPoint.target)
                 permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
+                permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
+                permissionRequest.permissionsDeniedMethod = getMethodWithAnnotation<OnPermissionsDenied>(joinPoint.target)
 
                 // begin the flow by requesting permissions
                 permissionCheckerFragment.setRequestPermissionsRequest(permissionRequest)

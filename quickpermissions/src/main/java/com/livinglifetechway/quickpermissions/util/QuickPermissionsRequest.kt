@@ -9,8 +9,10 @@ data class QuickPermissionsRequest(
         var rationaleMessage: String = "",
         var handlePermanentlyDenied: Boolean = true,
         var permanentlyDeniedMessage: String = "",
-        var rationaleMethod: Method? = null,
-        var permanentDeniedMethod: Method? = null,
+        internal var rationaleMethod: Method? = null,
+        internal var permanentDeniedMethod: Method? = null,
+        internal var permissionsDeniedMethod: Method? = null,
+        var deniedPermissions: Array<String> = emptyArray(),
         var permanentlyDeniedPermissions: Array<String> = emptyArray()
 ) {
     /**
