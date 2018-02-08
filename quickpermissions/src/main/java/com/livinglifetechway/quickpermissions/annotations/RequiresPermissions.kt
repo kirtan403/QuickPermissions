@@ -14,21 +14,22 @@ annotation class RequiresPermissions(
         val handlePermanentlyDenied: Boolean = true)
 
 /**
- * Permission Required annotation to safely execute code block requiring defined permissions
+ * Annotation for method to execute when it should handle rationale condition when permission is denied
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
 annotation class OnShowRationale
 
 /**
- * Permission Required annotation to safely execute code block requiring defined permissions
+ * Annotation for method to execute when it should handle permissions permanently denied condition
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
 annotation class OnPermissionsPermanentlyDenied
 
 /**
- * Permission Required annotation to safely execute code block requiring defined permissions
+ * Annotation for method to execute when it completes the permissions flow and the end result is
+ * one or more permissions denied
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
