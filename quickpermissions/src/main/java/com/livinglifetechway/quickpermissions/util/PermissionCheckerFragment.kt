@@ -2,6 +2,7 @@ package com.livinglifetechway.quickpermissions.util
 
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri.fromParts
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -9,26 +10,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.util.Log
 import org.jetbrains.anko.alert
-import java.lang.reflect.Method
 
-
-data class QuickPermissionsRequest(
-        var target: PermissionCheckerFragment,
-        var permissions: Array<String> = arrayOf(),
-        var handleRationale: Boolean = true,
-        var rationaleMessage: String = "",
-        var handlePermanentlyDenied: Boolean = true,
-        var permanentlyDeniedMessage: String = "",
-        var rationaleMethod: Method? = null,
-        var permanentDeniedMethod: Method? = null
-) {
-    fun proceed() {
-        target.requestPermissionsFromUser(this)
-    }
-
-    fun cancel() {
-    }
-}
 
 /**
  * A simple [Fragment] subclass.
@@ -112,16 +94,16 @@ class PermissionCheckerFragment : Fragment() {
                     return
                 }
 
-                activity.alert {
+                activity?.alert {
                     message = quickPermissionsRequest?.permanentlyDeniedMessage.orEmpty()
                     positiveButton("SETTINGS") {
                         val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS,
-                                fromParts("package", activity.packageName, null))
+                                fromParts("package", activity?.packageName, null))
                         //                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivityForResult(intent, 101)
                     }
                     negativeButton("CANCEL") { }
-                }.apply { isCancelable = false }.show()
+                }?.apply { isCancelable = false }?.show()
                 return
             }
 
@@ -133,13 +115,13 @@ class PermissionCheckerFragment : Fragment() {
                     return
                 }
 
-                activity.alert {
+                activity?.alert {
                     message = quickPermissionsRequest?.rationaleMessage.orEmpty()
                     positiveButton("TRY AGAIN") {
                         requestPermissionsFromUser(quickPermissionsRequest)
                     }
                     negativeButton("CANCEL") { }
-                }.apply { isCancelable = false }.show()
+                }?.apply { isCancelable = false }?.show()
             }
         }
     }
@@ -150,7 +132,7 @@ class PermissionCheckerFragment : Fragment() {
             val permissions = quickPermissionsRequest?.permissions ?: emptyArray()
             val grantResults = IntArray(permissions.size)
             permissions.forEachIndexed { index, s ->
-                grantResults[index] = ActivityCompat.checkSelfPermission(context, s)
+                grantResults[index] = context?.let { ActivityCompat.checkSelfPermission(it, s) } ?: PackageManager.PERMISSION_DENIED
             }
 
             handlePermissionResult(permissions, grantResults)

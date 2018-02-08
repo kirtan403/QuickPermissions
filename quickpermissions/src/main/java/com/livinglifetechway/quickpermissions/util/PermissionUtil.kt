@@ -22,11 +22,13 @@ object PermissionUtil {
      *
      * @see Activity.checkSelfPermission
      */
-    fun hasSelfPermission(activity: Context, permissions: Array<String>): Boolean {
+    fun hasSelfPermission(activity: Context?, permissions: Array<String>): Boolean {
         // Verify that all required permissions have been granted
-        for (permission in permissions) {
-            if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false
+        activity?.let {
+            for (permission in permissions) {
+                if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false
+                }
             }
         }
 
