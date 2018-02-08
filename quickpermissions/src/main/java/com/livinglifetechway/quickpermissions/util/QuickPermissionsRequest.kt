@@ -4,13 +4,14 @@ import java.lang.reflect.Method
 
 data class QuickPermissionsRequest(
         private var target: PermissionCheckerFragment,
-        var permissions: Array<String> = arrayOf(),
+        var permissions: Array<String> = emptyArray(),
         var handleRationale: Boolean = true,
         var rationaleMessage: String = "",
         var handlePermanentlyDenied: Boolean = true,
         var permanentlyDeniedMessage: String = "",
         var rationaleMethod: Method? = null,
-        var permanentDeniedMethod: Method? = null
+        var permanentDeniedMethod: Method? = null,
+        var permanentlyDeniedPermissions: Array<String> = emptyArray()
 ) {
     /**
      * Proceed with requesting permissions again with user request

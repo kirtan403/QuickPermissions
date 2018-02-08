@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 
 /**
  * Utility class that wraps access to the runtime permissions API in M and provides basic helper
@@ -14,6 +15,11 @@ object PermissionUtil {
     fun getDeniedPermissions(permissions: Array<String>, grantResults: IntArray): Array<String> =
             permissions.filterIndexed { index, s ->
                 grantResults[index] == PackageManager.PERMISSION_DENIED
+            }.toTypedArray()
+
+    fun getPermanentlyDeniedPermissions(fragment: Fragment, permissions: Array<String>, grantResults: IntArray): Array<String> =
+            permissions.filterIndexed { index, s ->
+                grantResults[index] == PackageManager.PERMISSION_DENIED && !fragment.shouldShowRequestPermissionRationale(s)
             }.toTypedArray()
 
     /**

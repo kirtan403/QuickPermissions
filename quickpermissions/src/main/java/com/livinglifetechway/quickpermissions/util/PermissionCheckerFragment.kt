@@ -105,6 +105,9 @@ class PermissionCheckerFragment : Fragment() {
             if (quickPermissionsRequest?.handlePermanentlyDenied == true && isPermanentlyDenied) {
 
                 quickPermissionsRequest?.permanentDeniedMethod?.let {
+                    // get list of permanently denied methods
+                    quickPermissionsRequest?.permanentlyDeniedPermissions =
+                            PermissionUtil.getPermanentlyDeniedPermissions(this, permissions, grantResults)
                     mListener?.onPermissionsPermanentlyDenied(quickPermissionsRequest)
                     return
                 }
