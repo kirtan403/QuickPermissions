@@ -3,7 +3,7 @@ package com.livinglifetechway.quickpermissions.util
 import java.lang.reflect.Method
 
 data class QuickPermissionsRequest(
-        var target: PermissionCheckerFragment,
+        private var target: PermissionCheckerFragment,
         var permissions: Array<String> = arrayOf(),
         var handleRationale: Boolean = true,
         var rationaleMessage: String = "",
@@ -12,10 +12,18 @@ data class QuickPermissionsRequest(
         var rationaleMethod: Method? = null,
         var permanentDeniedMethod: Method? = null
 ) {
-    fun proceed() {
-        target.requestPermissionsFromUser(this)
-    }
+    /**
+     * Proceed with requesting permissions again with user request
+     */
+    fun proceed() = target.requestPermissionsFromUser()
 
-    fun cancel() {
-    }
+    /**
+     * Cancels the current permissions request flow
+     */
+    fun cancel() = target.clean()
+
+    /**
+     * In case of permissions permanently denied, request user to enable from app settings
+     */
+    fun openAppSettings() = target.openAppSettings()
 }

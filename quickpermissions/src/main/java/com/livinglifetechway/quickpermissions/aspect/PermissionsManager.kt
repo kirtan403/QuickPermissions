@@ -133,7 +133,10 @@ class PermissionsManager {
                 permissionRequest.permanentDeniedMethod = getMethodWithAnnotation<OnPermissionPermanentlyDenied>(joinPoint.target)
 
                 // begin the flow by requesting permissions
-                permissionCheckerFragment.requestPermissionsFromUser(permissionRequest)
+                permissionCheckerFragment.setRequestPermissionsRequest(permissionRequest)
+
+                // start requesting permissions for the first time
+                permissionCheckerFragment.requestPermissionsFromUser()
             }
         } else {
             // context is null
