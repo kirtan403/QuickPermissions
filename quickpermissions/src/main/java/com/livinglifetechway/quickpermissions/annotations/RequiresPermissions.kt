@@ -25,7 +25,7 @@ annotation class OnShowRationale
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
-annotation class OnPermissionPermanentlyDenied
+annotation class OnPermissionsPermanentlyDenied
 
 /**
  * Permission Required annotation to safely execute code block requiring defined permissions

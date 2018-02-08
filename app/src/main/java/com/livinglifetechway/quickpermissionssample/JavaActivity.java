@@ -7,8 +7,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.livinglifetechway.quickpermissions.annotations.OnPermissionPermanentlyDenied;
 import com.livinglifetechway.quickpermissions.annotations.OnPermissionsDenied;
+import com.livinglifetechway.quickpermissions.annotations.OnPermissionsPermanentlyDenied;
 import com.livinglifetechway.quickpermissions.annotations.RequiresPermissions;
 import com.livinglifetechway.quickpermissions.util.QuickPermissionsRequest;
 
@@ -52,7 +52,7 @@ public class JavaActivity extends AppCompatActivity {
     //                .show();
     //
     //    }
-    @OnPermissionPermanentlyDenied
+    @OnPermissionsPermanentlyDenied
     public void onPerDenied(final QuickPermissionsRequest arg) {
         new AlertDialog.Builder(this)
                 .setTitle("Per Denied!!")
