@@ -53,7 +53,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.kirtan403:quickpermissions_plugin:1.0.0'
+//        classpath 'com.github.kirtan403:quickpermissions_plugin:1.0.0'
     }
 }
-apply plugin: 'com.livinglifetechway.quickpermissions_plugin'
+//apply plugin: 'com.livinglifetechway.quickpermissions_plugin'
