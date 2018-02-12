@@ -51,9 +51,12 @@ buildscript {
             url localRepo
         }
         jcenter()
+        mavenCentral()
+        google()
+        maven { url "http://jitpack.io/" }
     }
     dependencies {
-//        classpath 'com.github.kirtan403:quickpermissions_plugin:1.0.0'
+        classpath 'com.github.kirtan403:quickpermissions:1cfc1f583b'
     }
 }
-//apply plugin: 'com.livinglifetechway.quickpermissions_plugin'
+apply plugin: 'com.livinglifetechway.quickpermissions_plugin'
