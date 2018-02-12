@@ -66,8 +66,8 @@ class QuickPermissionsTransform extends Transform {
         // Weaving args
         def args = [
                 "-verbose",
-                "-source", "1.6",
-                "-target", "1.6",
+                "-source", "1.7",
+                "-target", "1.7",
                 "-showWeaveInfo",
                 "-inpath", inpath,
                 "-d", output.absolutePath,
@@ -114,8 +114,7 @@ class QuickPermissionsTransform extends Transform {
     @NonNull
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        return Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT,
-                QualifiedContent.Scope.EXTERNAL_LIBRARIES)
+        return Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT)
     }
 
     @Override
