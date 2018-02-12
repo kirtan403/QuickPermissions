@@ -6,7 +6,6 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
-apply plugin: 'com.archinamon.aspectj'
 
 android {
     compileSdkVersion 26
@@ -25,15 +24,8 @@ android {
         }
     }
     dataBinding.enabled = true
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
 }
 
-aspectj {
-    includeAspectsFromJar "quickpermissions"
-}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -43,7 +35,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation project(':quickpermissions')
     implementation 'com.github.kirtan403.k4kotlin:k4kotlin:0.5.1'
     kapt 'com.android.databinding:compiler:3.0.1'
 }
@@ -51,3 +42,18 @@ dependencies {
 kapt {
     generateStubs = true
 }
+
+buildscript {
+    def localRepo = new File("$projectDir/../repo/")
+    project.logger.info("Path: $projectDir")
+    repositories {
+        maven {
+            url localRepo
+        }
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.kirtan403:quickpermissions_plugin:1.0.0'
+    }
+}
+apply plugin: 'com.livinglifetechway.quickpermissions_plugin'

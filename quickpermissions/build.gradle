@@ -7,34 +7,23 @@ buildscript {
     }
 }
 
-
 import com.android.build.gradle.LibraryPlugin
 import org.aspectj.bridge.IMessage
 import org.aspectj.bridge.MessageHandler
 import org.aspectj.tools.ajc.Main
 
-//import org.aspectj.bridge.IMessage
-//import org.aspectj.bridge.MessageHandler
-//import org.aspectj.tools.ajc.Main
-
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-//apply plugin: 'com.archinamon.aspectj-provides'
 
 android {
     compileSdkVersion 26
-
-
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -44,10 +33,6 @@ android {
         }
     }
 
-//    compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_7
-//        targetCompatibility JavaVersion.VERSION_1_7
-//    }
 }
 
 ext.anko_version = '0.10.4'
@@ -61,13 +46,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.anko:anko-commons:$anko_version"
     implementation 'com.github.kirtan403.k4kotlin:k4kotlin:0.5.1'
-
     implementation 'org.aspectj:aspectjrt:1.8.13'
-//    implementation 'org.aspectj:aspectjtools:1.8.13'
 }
 
 android.libraryVariants.all { variant ->
-    LibraryPlugin plugin = project.plugins.getPlugin(LibraryPlugin)
     JavaCompile javaCompile = variant.javaCompile
     javaCompile.doLast {
         String[] args = [
