@@ -45,7 +45,7 @@ class QuickPermissionsTransform(private val project: Project) : Transform() {
         val inpath: String = Joiner.on(File.pathSeparator).join(files)
         val classpath: String = Joiner.on(File.pathSeparator).join(
                 classpathFiles.map { it.absolutePath })
-        val bootpath: String = Joiner.on(File.pathSeparator).join(project.androidModule.bootClasspath)
+        val bootpath: String = Joiner.on(File.pathSeparator).join(project.androidModule?.bootClasspath)
         val output: File? = outputProvider?.getContentLocation("main", outputTypes, Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT), Format.DIRECTORY)
 
         // Weaving args

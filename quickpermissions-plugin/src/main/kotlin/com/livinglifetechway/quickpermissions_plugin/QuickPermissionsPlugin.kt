@@ -22,7 +22,7 @@ class QuickPermissionsPlugin : Plugin<Project> {
                     || project.plugins.hasPlugin(InstantAppPlugin::class.java)) {
 
                 // register a transformer
-                project.androidModule.registerTransform(QuickPermissionsTransform(project))
+                project.androidModule?.registerTransform(QuickPermissionsTransform(project))
 
                 // add necessary dependencies
                 project.dependencies.add("implementation", "org.aspectj:aspectjrt:1.8.13")
