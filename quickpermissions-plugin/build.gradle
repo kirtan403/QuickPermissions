@@ -1,0 +1,45 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+ext.versions = [
+        compileSdkVersion : 27,
+        buildToolsVersion : '26.0.0',
+        minSdkVersion     : 15,
+        targetSdkVersion  : 27,
+        supportLibrary    : '27.0.1',
+        aspectjrt         : '1.8.13',
+        aspectjtools      : '1.8.13',
+        androidPlugin     : '3.0.1',
+        androidMavenPlugin: '1.2'
+]
+
+ext.deps = [
+        supportAnnotations : "com.android.support:support-annotations:${versions.supportLibrary}",
+        supportDesign      : "com.android.support:design:${versions.supportLibrary}",
+        appCompatv7        : "com.android.support:appcompat-v7:${versions.supportLibrary}",
+        aspectjrt          : "org.aspectj:aspectjrt:${versions.aspectjrt}",
+        aspectjtools       : "org.aspectj:aspectjtools:${versions.aspectjtools}",
+        androidGradlePlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
+        androidMavenPlugin : "com.github.dcendents:android-maven-plugin:${versions.androidMavenPlugin}",
+        junit              : 'junit:junit:4.12'
+]
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile deps.androidGradlePlugin
+    compile deps.aspectjtools
+    compile deps.aspectjrt
+}
+
+group = 'com.github.kirtan403'
+version = '1.0.0'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+            pom.artifactId = 'quickpermissions_plugin'
+        }
+    }
+}

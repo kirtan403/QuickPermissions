@@ -1,1 +1,1 @@
-include ':app', ':quickpermissions'
+include ':app', ':quickpermissions', ':quickpermissions-plugin'
