@@ -26,7 +26,7 @@ class QuickPermissionsPlugin : Plugin<Project> {
 
                 // add necessary dependencies
                 project.dependencies.add("implementation", "org.aspectj:aspectjrt:1.8.13")
-                project.dependencies.add("implementation", "com.github.kirtan403:quickpermissions:41cbd2c910")
+                project.dependencies.add("api", "com.github.kirtan403:quickpermissions:41cbd2c910")
 
             } else {
                 // throw exception it doesn't work on any other module
